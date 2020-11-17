@@ -43,11 +43,23 @@ subjects:
     name: auto-run-all
     namespace: autoops
 ---
+# create configmap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  # !!!CHANGE ME!!!
+  name:  auto-run-all-demo
+  namespace: autoops
+data:
+  script.sh: |
+    echo hello world
+---
 # create cronjob
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: auto-run-all
+  # !!!CHANGE ME!!!
+  name: auto-run-all-demo
   namespace: autoops
 spec:
   schedule: "*/5 * * * *"
@@ -57,9 +69,17 @@ spec:
         spec:
           serviceAccount: auto-run-all
           containers:
-            - name: auto-run-all
+            - name: auto-run-all-demo
               image: autoops/auto-run-all
+              volumeMounts:
+                - mountPath: /autoops-data/auto-run-all
+                  name: vol-script
           restartPolicy: OnFailure
+          volumes:
+            - name: vol-script
+              configMap:
+                # !!!CHANGE ME!!!
+                name: auto-run-all-demo
 ```
 
 ## Credits
